@@ -69,7 +69,7 @@ template <class EntityType>
 class EntityEditor {
 public:
 	using Registry = entt::basic_registry<EntityType>;
-	using ComponentTypeID = ENTT_ID_TYPE;
+	using ComponentTypeID = entt::id_type;
 
 	struct ComponentInfo {
 		using Callback = std::function<void(Registry&, EntityType)>;
@@ -92,7 +92,7 @@ public:
 	template <class Component>
 	ComponentInfo& registerComponent(const ComponentInfo& component_info)
 	{
-		auto index = entt::type_info<Component>::id();
+		auto index = entt::type_hash<Component>::value();
 		[[maybe_unused]] auto [it, insert_result] = component_infos.insert_or_assign(index, component_info);
 		MM_IEEE_ASSERT(insert_result);
 		return std::get<ComponentInfo>(*it);
@@ -233,7 +233,7 @@ public:
 			});
 		} else {
 			auto view = registry.runtime_view(comp_list.begin(), comp_list.end());
-			ImGui::Text("%lu Entities Matching:", view.size());
+			ImGui::Text("%lu Entities Matching:", view.size_hint());
 
 			if (ImGui::BeginChild("entity list")) {
 				for (auto e : view) {
